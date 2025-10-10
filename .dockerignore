@@ -1,0 +1,25 @@
+# Exclude local dependencies and caches
+node_modules
+npm-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+*.log
+
+# VCS
+.git
+.gitignore
+
+# OS/editor files
+.DS_Store
+.vscode
+.idea
+
+# Build artifacts
+dist
+coverage
+tmp
+.cache
+
+# Misc
+.env
+.env.*
