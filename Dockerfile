@@ -3,6 +3,8 @@ FROM node:20-alpine
 # Cloud Run will inject PORT. Ensure server binds to 0.0.0.0 and respects PORT.
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
+# Set default PORT to 8080 if not provided by Cloud Run
+ENV PORT=8080
 
 # Create app directory
 RUN mkdir -p /home/node/app
