@@ -56,11 +56,11 @@
     "@y/protocols": "^1.0.6-1",
     "@y/websocket-server": "^0.1.1",
     "lib0": "^0.2.102",
+    "patch-package": "^8.0.1",
     "yjs": "^13.6.27"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
-    "patch-package": "^8.0.1",
     "rollup": "^4.43.0",
     "standard": "^17.1.2",
     "typescript": "^5.8.3"
