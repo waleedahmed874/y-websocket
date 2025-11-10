@@ -1,8 +1,8 @@
 diff --git a/node_modules/@y/websocket-server/src/utils.js b/node_modules/@y/websocket-server/src/utils.js
-index d624c5a..9ce735b 100644
+index d624c5a..0364c26 100644
 --- a/node_modules/@y/websocket-server/src/utils.js
 +++ b/node_modules/@y/websocket-server/src/utils.js
-@@ -23,28 +23,27 @@ const wsReadyStateClosed = 3 // eslint-disable-line
+@@ -23,28 +23,34 @@ const wsReadyStateClosed = 3 // eslint-disable-line
  
  // disable gc when using snapshots!
  const gcEnabled = process.env.GC !== 'false' && process.env.GC !== '0'
@@ -36,11 +36,18 @@ index d624c5a..9ce735b 100644
 +persistence = {
 +  provider: ldb,
 +  bindState: async (docName, ydoc) => {
++    console.log(`📂 [LevelDB] Loading document: "${docName}"`)
 +    const persistedYdoc = await ldb.getYDoc(docName)
++    const persistedState = Y.encodeStateAsUpdate(persistedYdoc)
++    console.log(`📥 [LevelDB] Retrieved ${persistedState.length} bytes for room: "${docName}"`)
++    
 +    const newUpdates = Y.encodeStateAsUpdate(ydoc)
 +    ldb.storeUpdate(docName, newUpdates)
 +    Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc))
++    console.log(`✅ [LevelDB] Document "${docName}" loaded and applied`)
++    
 +    ydoc.on('update', update => {
++      console.log(`💾 [LevelDB] Saving update (${update.length} bytes) for room: "${docName}"`)
 +      ldb.storeUpdate(docName, update)
 +    })
 +  },
@@ -48,3 +55,27 @@ index d624c5a..9ce735b 100644
  }
  
  /**
+@@ -212,8 +218,10 @@ const closeConn = (doc, conn) => {
+     // @ts-ignore
+     const controlledIds = doc.conns.get(conn)
+     doc.conns.delete(conn)
++    console.log(`👋 [WebSocket] Client disconnected from room: "${doc.name}" (Remaining clients: ${doc.conns.size})`)
+     awarenessProtocol.removeAwarenessStates(doc.awareness, Array.from(controlledIds), null)
+     if (doc.conns.size === 0 && persistence !== null) {
++      console.log(`🔒 [Room] No clients left in room: "${doc.name}" - Cleaning up`)
+       // if persisted, we store state and destroy ydocument
+       persistence.writeState(doc.name, doc).then(() => {
+         doc.destroy()
+@@ -249,9 +257,12 @@ const pingTimeout = 30000
+  */
+ export const setupWSConnection = (conn, req, { docName = (req.url || '').slice(1).split('?')[0], gc = true } = {}) => {
+   conn.binaryType = 'arraybuffer'
++  console.log(`🔌 [WebSocket] New connection to room: "${docName}"`)
++  console.log(`👥 [WebSocket] Active connections in room "${docName}": ${docs.get(docName)?.conns.size || 0}`)
+   // get doc, initialize if it does not exist yet
+   const doc = getYDoc(docName, gc)
+   doc.conns.set(conn, new Set())
++  console.log(`✅ [WebSocket] Client connected to room: "${docName}" (Total clients: ${doc.conns.size})`)
+   // listen and reply to events
+   conn.on('message', /** @param {ArrayBuffer} message */ message => messageListener(conn, doc, new Uint8Array(message)))
+ 
