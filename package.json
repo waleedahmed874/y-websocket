@@ -16,7 +16,8 @@
     "dist": "rm -rf dist && rollup -c && tsc",
     "lint": "standard && tsc",
     "test": "npm run lint",
-    "preversion": "npm run lint && npm run dist && test -e dist/src/y-websocket.d.ts && test -e dist/y-websocket.cjs"
+    "preversion": "npm run lint && npm run dist && test -e dist/src/y-websocket.d.ts && test -e dist/y-websocket.cjs",
+    "postinstall": "patch-package"
   },
   "files": [
     "dist/*",
@@ -59,6 +60,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "patch-package": "^8.0.1",
     "rollup": "^4.43.0",
     "standard": "^17.1.2",
     "typescript": "^5.8.3"
